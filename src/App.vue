@@ -52,8 +52,11 @@
             <input type="checkbox" v-model="task.completed" />
             {{ task.name }}
           </td>
-          <td>{{ task.value ? task.value.toFixed(2) : '0.00' }}</td>
-          <td>{{ task.valorParcela ? task.valorParcela.toFixed(2) : '0.00' }}</td>
+          <td>{{ task.value ? task.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00' }}
+          </td>
+          <td>{{ task.valorParcela ? task.valorParcela.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) :
+            'R$ 0,00' }}</td>
+
           <td>{{ task.parcelasPagas }}</td>
           <td>{{ task.parcelasRestantes }}</td>
           <td>{{ task.date }}</td> <!-- Exibindo a data aqui -->
@@ -75,8 +78,9 @@
 
 
     <div class="total">
-      <strong>Total: R$ {{ totalValue.toFixed(2) }}</strong>
+      <strong>Total: {{ totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</strong>
     </div>
+
 
     <footer class="footer">
       <div class="footer-container">
