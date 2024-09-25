@@ -1,26 +1,393 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app">
+    <h1>Gerenciador de Tarefas</h1>
+
+    <form @submit.prevent="addTask" class="task-form">
+      <div class="form-group">
+        <label for="task">Nova Tarefa:</label>
+        <input type="text" id="task" v-model="newTask" placeholder="Nova Tarefa" required />
+      </div>
+
+      <div class="form-group">
+        <label for="value">Valor Total (R$):</label>
+        <input type="number" id="value" v-model.number="newTaskValue" placeholder="Valor Total (R$)" min="0" step="0.01"
+          required />
+      </div>
+
+      <div class="form-group">
+        <label for="quantity">Quantidade:</label>
+        <input type="number" id="quantity" v-model.number="newTaskQuantity" placeholder="Quantidade" min="1" required />
+      </div>
+
+      <div class="form-group">
+        <label for="date">Data (DD/MM/AAAA):</label>
+        <input type="text" id="date" v-model="newTaskDate" placeholder="Data (DD/MM/AAAA)" required />
+      </div>
+
+      <div class="form-group">
+        <label for="installments">Número de Parcelas:</label>
+        <input type="number" id="installments" v-model.number="newTaskInstallments" placeholder="Número de Parcelas"
+          min="1" required />
+      </div>
+
+      <button type="submit">Adicionar Tarefa</button>
+    </form>
+
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th>Tarefa</th>
+          <th>Valor Total (R$)</th>
+          <th>Valor da Parcela (R$)</th>
+          <th>Parcelas Pagas</th>
+          <th>Parcelas Restantes</th>
+          <th>Data</th> <!-- Nova coluna de Data -->
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(task, index) in filteredTasks" :key="index">
+          <td :class="{ completed: task.completed }">
+            <input type="checkbox" v-model="task.completed" />
+            {{ task.name }}
+          </td>
+          <td>{{ task.value ? task.value.toFixed(2) : '0.00' }}</td>
+          <td>{{ task.valorParcela ? task.valorParcela.toFixed(2) : '0.00' }}</td>
+          <td>{{ task.parcelasPagas }}</td>
+          <td>{{ task.parcelasRestantes }}</td>
+          <td>{{ task.date }}</td> <!-- Exibindo a data aqui -->
+          <td>
+            <span :class="{ 'status-completed': task.completed, 'status-pending': !task.completed }">
+              {{ task.completed ? 'Concluída' : 'Pendente' }}
+            </span>
+          </td>
+          <td>
+            <!-- Botões devem estar dentro de uma célula de tabela -->
+            <div>
+              <button class="btn pay-btn" @click="pagarParcela(task)">Pagar Parcela</button>
+              <button class="btn remove-btn" @click="removeTask(index)">Remover</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    <div class="total">
+      <strong>Total: R$ {{ totalValue.toFixed(2) }}</strong>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="social-icons">
+          <a href="https://www.instagram.com/digitalcombruno/" target="_blank" title="Instagram" aria-label="Instagram">
+            <img src="@/assets/instagram.png" alt="Instagram" class="social-icon" />
+          </a>
+          <a href="https://wa.me/5521977167009" target="_blank" title="WhatsApp" aria-label="WhatsApp">
+            <img src="@/assets/whatsapp.png" alt="WhatsApp" class="social-icon" />
+          </a>
+          <a href="https://www.linkedin.com/in/your-linkedin-profile" target="_blank" title="LinkedIn"
+            aria-label="LinkedIn">
+            <img src="@/assets/linkedin.png" alt="LinkedIn" class="social-icon" />
+          </a>
+          <a href="https://github.com/brunopintonascimento" target="_blank" title="GitHub" aria-label="GitHub">
+            <img src="@/assets/github.png" alt="GitHub" class="social-icon" />
+          </a>
+        </div>
+        <p class="footer-text">© 2024 Bruno Pinto Nascimento. Todos os direitos reservados.</p>
+      </div>
+    </footer>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
   name: 'App',
-  components: {
-    HelloWorld
+  data() {
+    return {
+      newTask: '',
+      newTaskValue: 0,
+      newTaskQuantity: 1,
+      newTaskDate: '',
+      newTaskInstallments: 1,
+      tasks: [],
+      filter: 'all',
+    };
+  },
+  computed: {
+    filteredTasks() {
+      switch (this.filter) {
+        case 'completed':
+          return this.tasks.filter(task => task.completed);
+        case 'pending':
+          return this.tasks.filter(task => !task.completed);
+        default:
+          return this.tasks;
+      }
+    },
+    totalValue() {
+      return this.tasks.reduce((total, task) => total + (task.value || 0), 0);
+    },
+  },
+  methods: {
+    addTask() {
+      const valorParcela = this.newTaskValue / this.newTaskInstallments;
+      if (this.isValidTaskInput()) {
+        this.tasks.push({
+          name: this.newTask.trim(),
+          value: this.newTaskValue,
+          quantity: this.newTaskQuantity,
+          date: this.newTaskDate,
+          installments: this.newTaskInstallments,
+          parcelasPagas: 0,
+          parcelasRestantes: this.newTaskInstallments,
+          valorParcela: valorParcela,
+          completed: false,
+        });
+        this.resetForm();
+        this.saveTasks();
+      } else {
+        alert('Por favor, preencha todos os campos corretamente.');
+      }
+    },
+    pagarParcela(task) {
+      if (task.parcelasRestantes > 0) {
+        task.parcelasPagas += 1;
+        task.parcelasRestantes -= 1;
+        if (task.parcelasRestantes === 0) {
+          task.completed = true;
+        }
+        this.saveTasks();
+      } else {
+        alert('Todas as parcelas já foram pagas.');
+      }
+    },
+    removeTask(index) {
+      if (confirm('Você tem certeza que deseja remover esta tarefa?')) {
+        this.tasks.splice(index, 1);
+        this.saveTasks();
+      }
+    },
+    saveTasks() {
+      localStorage.setItem('tasks', JSON.stringify(this.tasks));
+    },
+    loadTasks() {
+      const storedTasks = localStorage.getItem('tasks');
+      if (storedTasks) {
+        this.tasks = JSON.parse(storedTasks);
+      }
+    },
+    resetForm() {
+      this.newTask = '';
+      this.newTaskValue = 0;
+      this.newTaskQuantity = 1;
+      this.newTaskDate = '';
+      this.newTaskInstallments = 1;
+    },
+    isValidTaskInput() {
+      return this.newTask.trim() &&
+        this.newTaskValue >= 0 &&
+        this.newTaskQuantity > 0 &&
+        this.newTaskDate.trim() &&
+        this.newTaskInstallments > 0;
+    }
+  },
+  mounted() {
+    this.loadTasks();
   }
-}
+};
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: Arial, sans-serif;
   text-align: center;
+  margin: 20px auto;
+  background: linear-gradient(135deg, #ffffff, #e8f4fc);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  max-width: 1000px;
+}
+
+h1 {
+  color: #34495e;
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+}
+
+.task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+label {
+  margin-bottom: 5px;
+  font-weight: bold;
   color: #2c3e50;
-  margin-top: 60px;
+}
+
+input[type="text"],
+input[type="number"] {
+  padding: 12px;
+  border: 2px solid #2980b9;
+  border-radius: 6px;
+  width: 100%;
+  max-width: 450px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+  border-color: #1abc9c;
+}
+
+button {
+  padding: 14px 70px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #c0392b;
+}
+
+/* Estilo geral dos botões */
+table.modern-table .btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Botão "Pagar Parcela" - Verde */
+.pay-btn {
+  background-color: #2ecc71;
+  /* Verde */
+  color: white;
+}
+
+.pay-btn:hover {
+  background-color: #27ae60;
+  /* Verde escuro no hover */
+}
+
+/* Botão "Remover" - Vermelho */
+.remove-btn {
+  background-color: #e74c3c;
+  /* Vermelho */
+  color: white;
+  margin-left: 8px;
+}
+
+.remove-btn:hover {
+  background-color: #c0392b;
+  /* Vermelho escuro no hover */
+}
+
+th,
+td {
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #2c3e50;
+  color: white;
+  font-weight: bold;
+}
+
+tr:hover {
+  background-color: #f9f9f9;
+}
+
+td input[type="checkbox"] {
+  transform: scale(1.3);
+}
+
+td.completed {
+  text-decoration: line-through;
+}
+
+.status-completed {
+  color: #27ae60;
+  font-weight: bold;
+}
+
+.status-pending {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+.pay-btn {
+  background-color: #1abc9c;
+}
+
+.remove-btn {
+  background-color: #e74c3c;
+  margin-left: 10px;
+}
+
+.footer {
+  margin-top: 50px;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #34495e;
+  color: white;
+  border-radius: 0 0 6px 6px;
+}
+
+.social-icons a {
+  margin: 0 10px;
+}
+
+.social-icon {
+  width: 35px;
+  height: 35px;
+  transition: transform 0.3s ease;
+}
+
+.social-icon:hover {
+  transform: scale(1.1);
+}
+
+.footer-text {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+  }
+
+  .social-icons {
+    margin-bottom: 15px;
+  }
 }
 </style>
