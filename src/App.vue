@@ -212,7 +212,7 @@ export default {
   font-family: Arial, sans-serif;
   text-align: center;
   margin: 20px auto;
-  background: linear-gradient(135deg, #ffffff, #e8f4fc);
+  background: linear-gradient(135deg, #ffffff1c, #e8f4fc);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
@@ -231,12 +231,44 @@ h1 {
   flex-direction: column;
   gap: 15px;
   margin-bottom: 30px;
+  overflow-x: auto;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+.total {
+  padding: 12px 24px; /* Padding inicial */
+  border: none;
+  border-radius: 4px;
+  font-size: 2rem; /* Tamanho da fonte em rem para responsividade */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: 2px solid #34495e;
+  background-color: #34495e; /* Cor de fundo inicial */
+  color: white; /* Cor do texto */
+}
+
+/* Estilo ao passar o mouse */
+.total:hover {
+  background-color: #2980b9; /* Cor de fundo ao passar o mouse */
+}
+
+/* Media Queries para responsividade */
+@media (max-width: 768px) {
+  .total {
+    padding: 10px 20px; /* Ajuste de padding para telas menores */
+    font-size: 1.5rem; /* Tamanho da fonte menor */
+  }
+}
+
+@media (max-width: 480px) {
+  .total {
+    padding: 8px 16px; /* Ajuste de padding para telas ainda menores */
+    font-size: 1.2rem; /* Tamanho da fonte ainda menor */
+  }
 }
 
 label {
@@ -263,7 +295,7 @@ input[type="number"]:focus {
 
 button {
   padding: 14px 70px;
-  background-color: #e74c3c;
+  background-color: #3ce745;
   color: white;
   border: none;
   border-radius: 6px;
@@ -272,26 +304,22 @@ button {
   text-transform: uppercase;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  
 }
 
 button:hover {
   background-color: #c0392b;
 }
 
-/* Estilo geral dos botões */
-table.modern-table .btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
+
 
 /* Botão "Pagar Parcela" - Verde */
 .pay-btn {
   background-color: #2ecc71;
   color: white;
+  width: 100px;
+  cursor: pointer;
+  margin-left: 8px;
 }
 
 .pay-btn:hover {
@@ -303,15 +331,26 @@ table.modern-table .btn {
   background-color: #e74c3c;
   color: white;
   margin-left: 8px;
+  width: 100px;
+  cursor: pointer;
 }
 
 .remove-btn:hover {
   background-color: #c0392b;
 }
-
+/* Estilo geral dos botões */
+table.modern-table .btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
 /* Tabela responsiva */
 .table-container {
   overflow-x: auto;
+  flex-wrap: wrap;
 }
 
 table.modern-table {
@@ -369,19 +408,25 @@ td.completed {
   border-radius: 0 0 6px 6px;
 }
 
-.social-icons a {
-  margin: 0 10px;
+.social-icons {
+  display: flex; /* Para alinhar os ícones lado a lado */
+  gap: 10px; /* Espaçamento entre os ícones */
+  flex-wrap: wrap;
+ 
 }
 
 .social-icon {
-  width: 35px;
-  height: 35px;
-  transition: transform 0.3s ease;
+  width: 40px; /* Defina a largura desejada */
+  height: 40px; /* Defina a altura desejada */
+  border-radius: 50%; /* Arredondar as imagens */
+  object-fit: cover; /* Mantém a proporção da imagem */
+  transition: transform 0.3s ease; /* Transição para efeito de hover */
 }
 
 .social-icon:hover {
-  transform: scale(1.1);
+  transform: scale(1.1); /* Efeito de zoom ao passar o mouse */
 }
+
 
 .footer-text {
   margin: 0;

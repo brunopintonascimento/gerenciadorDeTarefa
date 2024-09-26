@@ -1,87 +1,101 @@
 <template>
-  <div>
-    <ul>
-      <li v-for="(task, index) in tasks" :key="index">
-        <TaskItem 
-          :title="task.name" 
-          :completed="task.completed" 
-          @update:completed="updateTaskCompletion(index, $event)" 
-          @remove="removeTask(index)"
-        />
-      </li>
-    </ul>
+  <div class="table-container">
+    <h1>Lista de Tarefas</h1>
+
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th>Tarefa</th>
+          <th>Valor Total (R$)</th>
+          <th>Valor da Parcela (R$)</th>
+          <th>Parcelas Pagas</th>
+          <th>Parcelas Restantes</th>
+          <th>Data</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(task, index) in tasks" :key="index">
+          <td :class="{ completed: task.completed }">
+            <input type="checkbox" v-model="task.completed" />
+            {{ task.name }}
+          </td>
+          <td>{{ task.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</td>
+          <td>{{ task.valorParcela.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</td>
+          <td>{{ task.parcelasPagas }}</td>
+          <td>{{ task.parcelasRestantes }}</td>
+          <td>{{ task.date }}</td>
+          <td>{{ task.completed ? 'Concluída' : 'Pendente' }}</td>
+          <td>
+            <button class="pay-btn" @click="pagarParcela(task)">Pagar Parcela</button>
+            <button class="remove-btn" @click="removeTask(index)">Remover</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <router-link to="/" class="back-btn">Voltar para tela inicial</router-link>
   </div>
 </template>
 
 <script>
-import TaskItem from './TaskItem.vue'; // Certifique-se de que o caminho está correto
-
 export default {
-  components: {
-    TaskItem,
-  },
-  props: {
-    tasks: Array,
+  data() {
+    return {
+      tasks: [],
+    };
   },
   methods: {
-    updateTaskCompletion(index, completed) {
-      this.$emit('update-task', index, completed); // Emitir o novo estado
+    pagarParcela(task) {
+      if (task.parcelasRestantes > 0) {
+        task.parcelasPagas += 1;
+        task.parcelasRestantes -= 1;
+        if (task.parcelasRestantes === 0) {
+          task.completed = true;
+        }
+        this.saveTasks();
+      } else {
+        alert("Todas as parcelas já foram pagas.");
+      }
     },
     removeTask(index) {
-      this.$emit('remove-task', index); // Emitir evento de remoção
+      if (confirm("Você tem certeza que deseja remover esta tarefa?")) {
+        this.tasks.splice(index, 1);
+        this.saveTasks();
+      }
     },
+    saveTasks() {
+      localStorage.setItem("tasks", JSON.stringify(this.tasks));
+    },
+    loadTasks() {
+      const storedTasks = localStorage.getItem("tasks");
+      if (storedTasks) {
+        this.tasks = JSON.parse(storedTasks);
+      }
+    },
+  },
+  mounted() {
+    this.loadTasks();
   },
 };
 </script>
 
-
 <style scoped>
-.task-item {
-  background-color: #fff;
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 4px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.task-name {
-  flex: 1;
-  margin-left: 10px;
-}
-
-.edit-input {
-  flex: 1;
-  margin-left: 10px;
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.edit-button, .remove-button {
-  padding: 5px 10px;
-  margin-left: 10px; /* Espaço à esquerda do botão Remover */
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.edit-button {
-  background-color: #007bff; /* Cor do botão Editar/Salvar */
+/* Estilos opcionais */
+.back-btn {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #3498db;
   color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 16px;
+  transition: background-color 0.3s;
 }
 
-.edit-button:hover {
-  background-color: #0056b3; /* Cor ao passar o mouse para Editar/Salvar */
-}
-
-.remove-button {
-  background-color: #dc3545; /* Cor do botão Remover */
-  color: white;
-}
-
-.remove-button:hover {
-  background-color: #c82333; /* Cor ao passar o mouse para Remover */
+.back-btn:hover {
+  background-color: #2980b9;
 }
 </style>
