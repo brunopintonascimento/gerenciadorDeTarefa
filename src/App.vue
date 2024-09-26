@@ -33,48 +33,52 @@
       <button type="submit">Adicionar Tarefa</button>
     </form>
 
-    <table class="modern-table">
-      <thead>
-        <tr>
-          <th>Tarefa</th>
-          <th>Valor Total (R$)</th>
-          <th>Valor da Parcela (R$)</th>
-          <th>Parcelas Pagas</th>
-          <th>Parcelas Restantes</th>
-          <th>Data</th> <!-- Nova coluna de Data -->
-          <th>Status</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(task, index) in filteredTasks" :key="index">
-          <td :class="{ completed: task.completed }">
-            <input type="checkbox" v-model="task.completed" />
-            {{ task.name }}
-          </td>
-          <td>{{ task.value ? task.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00' }}
-          </td>
-          <td>{{ task.valorParcela ? task.valorParcela.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) :
-            'R$ 0,00' }}</td>
+    <div class="table-container">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Tarefa</th>
+            <th>Valor Total (R$)</th>
+            <th>Valor da Parcela (R$)</th>
+            <th>Parcelas Pagas</th>
+            <th>Parcelas Restantes</th>
+            <th>Data</th> <!-- Nova coluna de Data -->
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(task, index) in filteredTasks" :key="index">
+            <td :class="{ completed: task.completed }">
+              <input type="checkbox" v-model="task.completed" />
+              {{ task.name }}
+            </td>
+            <td>{{ task.value ? task.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00'
+              }}
+            </td>
+            <td>{{ task.valorParcela ? task.valorParcela.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+              :
+              'R$ 0,00' }}</td>
 
-          <td>{{ task.parcelasPagas }}</td>
-          <td>{{ task.parcelasRestantes }}</td>
-          <td>{{ task.date }}</td> <!-- Exibindo a data aqui -->
-          <td>
-            <span :class="{ 'status-completed': task.completed, 'status-pending': !task.completed }">
-              {{ task.completed ? 'Concluída' : 'Pendente' }}
-            </span>
-          </td>
-          <td>
-            <!-- Botões devem estar dentro de uma célula de tabela -->
-            <div>
-              <button class="btn pay-btn" @click="pagarParcela(task)">Pagar Parcela</button>
-              <button class="btn remove-btn" @click="removeTask(index)">Remover</button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            <td>{{ task.parcelasPagas }}</td>
+            <td>{{ task.parcelasRestantes }}</td>
+            <td>{{ task.date }}</td> <!-- Exibindo a data aqui -->
+            <td>
+              <span :class="{ 'status-completed': task.completed, 'status-pending': !task.completed }">
+                {{ task.completed ? 'Concluída' : 'Pendente' }}
+              </span>
+            </td>
+            <td>
+              <!-- Botões devem estar dentro de uma célula de tabela -->
+              <div>
+                <button class="btn pay-btn" @click="pagarParcela(task)">Pagar Parcela</button>
+                <button class="btn remove-btn" @click="removeTask(index)">Remover</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
 
     <div class="total">
@@ -287,26 +291,32 @@ table.modern-table .btn {
 /* Botão "Pagar Parcela" - Verde */
 .pay-btn {
   background-color: #2ecc71;
-  /* Verde */
   color: white;
 }
 
 .pay-btn:hover {
   background-color: #27ae60;
-  /* Verde escuro no hover */
 }
 
 /* Botão "Remover" - Vermelho */
 .remove-btn {
   background-color: #e74c3c;
-  /* Vermelho */
   color: white;
   margin-left: 8px;
 }
 
 .remove-btn:hover {
   background-color: #c0392b;
-  /* Vermelho escuro no hover */
+}
+
+/* Tabela responsiva */
+.table-container {
+  overflow-x: auto;
+}
+
+table.modern-table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
 th,
@@ -344,15 +354,7 @@ td.completed {
   font-weight: bold;
 }
 
-.pay-btn {
-  background-color: #1abc9c;
-}
-
-.remove-btn {
-  background-color: #e74c3c;
-  margin-left: 10px;
-}
-
+/* Estilo para o footer */
 .footer {
   margin-top: 50px;
 }
@@ -394,4 +396,5 @@ td.completed {
     margin-bottom: 15px;
   }
 }
+
 </style>
