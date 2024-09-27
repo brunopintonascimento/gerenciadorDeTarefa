@@ -226,19 +226,84 @@ h1 {
   text-transform: uppercase;
 }
 
+/* Estilo padrão para a task-form */
 .task-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
   margin-bottom: 30px;
-  overflow-x: auto;
+  padding: 20px;
+  background-color: #f5f5f5; /* Cor de fundo leve */
+  border-radius: 8px;
+  max-width: 600px; /* Limita a largura máxima para telas grandes */
+  margin: 0 auto; /* Centraliza o formulário */
 }
 
+/* Estilo padrão para os form-groups */
 .form-group {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  width: 100%;
 }
+
+.form-group label {
+  margin-bottom: 5px;
+  font-size: 1rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+/* Estilos para telas médias */
+@media (max-width: 768px) {
+  .task-form {
+    max-width: 90%; /* Reduz a largura máxima */
+    padding: 15px; /* Reduz o padding em telas médias */
+  }
+
+  .form-group label {
+    font-size: 0.95rem; /* Reduz um pouco o tamanho da fonte */
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 0.95rem; /* Reduz o tamanho da fonte dos campos */
+    padding: 8px; /* Reduz o padding dos campos */
+  }
+}
+
+/* Estilos para telas pequenas */
+@media (max-width: 480px) {
+  .task-form {
+    max-width: 100%; /* O formulário ocupa toda a largura disponível */
+    padding: 10px; /* Menos padding para telas pequenas */
+  }
+
+  .form-group label {
+    font-size: 0.9rem; /* Fonte menor para rótulos */
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 0.9rem; /* Fonte menor para campos */
+    padding: 6px; /* Padding menor */
+  }
+
+  .task-form {
+    gap: 10px; /* Menos espaço entre os elementos em telas pequenas */
+  }
+}
+
 .total {
   padding: 12px 24px; /* Padding inicial */
   border: none;
